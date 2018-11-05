@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+    <entry>
+      <title><![CDATA[TCP/IP common risks]]></title>
+      <url>/security/2018/10/11/TCP-IP-common-security-risks/</url>
+      <content type="text"><![CDATA[Application Layervulnerability,stack overflow,virus/trojan..Transport LayerTCP deception,TCP DoS,UDP DoS,port scan..Network LayerIP spoofing,Smurf Attack,ICMP attack,address scan…Datalink LayerMAC deception,MAC flood,ARP deception..Physical LayerEquipment damage,]]></content>
+      <categories>
+        
+          <category> security </category>
+        
+      </categories>
+      <tags>
+        
+          <tag> TCP/IP </tag>
+        
+      </tags>
+      <tags></tags>
+    </entry>
+  
+    <entry>
+      <title><![CDATA[Using MongoDB with Python]]></title>
+      <url>/mongodb/cloud/2018/09/02/twitter-analysis-improved/</url>
+      <content type="text"><![CDATA[Why MongoDB?In the cloud project of twitter analysis, couchDB is used to hold all the data. MongoDB is also a kind of NoSQL database while it provides faster read speeds and performs better when the database is growing rapidly. More comparisons can be seen here in this article (couchdb-vs-mongodb). Generally speaking, MongoDB is more popular than CouchDB, which is also the main reason why I choose to use MongoDB when I try to containerise the twitter analysis application.Connect to MongoDBimport pymongo#connect to the database server MongoClient(ip,port), the default number is 27017client = pymongo.MongoClient('localhost',27017)Create a new database named twitterdb = client.twitternote that at this time the database is still not created. It is created until the first record is inserted.Create a new collection named tweetstweets = db.tweetssame as before, the collection is not created until the first record is insertedInsert a new recordnew_record = {'name':'jian','age':25}#insert_one() inserts one record into the collections, returns a InsertOneResult object, in which includes the _id field of the recordresult = tweets.insert_one(new_record)print(result.inserted_id)#insert_many() method inserts a list of recordsnew_list = [new_record,{'name':'rico','age':25}]result_many = tweets.insert_many(new_list)print(result_many.inserted_ids)Find a record &amp; Query#find_one() returns the first matched record in the selectionone_record = tweets.find_one()#find() returns all the matched record, empty parameter means select ALLall_records = tweets.find()#the first parameter of the find() method is a query object used to confine the results, the second parameter is used to define which fields should be included in the results, 'field':0(omit) or 1(include). You are not allowed to specify both 0 and 1 values in the same object (except if one of the fields is the _id field). If you specify a field with the value 0, all other fields get the value 1, and vice versa#find results with name as ricoquery = {'name':'rico'}query_result = tweets.find(query)#find results with name starts with rreg_query = {'name':{'$regex':'^r'}}reg_query_result = tweets.find(reg_query)#return only the age fieldage_only = tweets.find({},{'age': 1})Sort the result#sort() can be used to sort the result in ascending or descending order. It takes one parameter for field and one parameter for orderascending_name = tweets.find().sort('name',1)descending_name = tweets.find().sort('name',-1)Delete record#delete_one() method behaves just like the find_one() method without the field confining. Same is the delete_many() methoddeleted_one = tweets.delete_one({'name':'rico'})deleted_many = tweets.delete_many({'age':25})print(deleted_many.deleted_count,'documents have been deleted')Delete collection#drop() method is used to delete the whole collection. The difference between drop() and delete_many({}) is that delete_many({}) just clears the whole records, the collection still exists but it is empty, while after drop() the collection does not exist any more.#this drops the tweets collection,returns true if drop() succeed, false if the collection does not existtweets.drop()Update collection#still, update_one() behaves like find_one(), update_many() behaves like find(). But the second parameter is the new values of the recordnew_values = {'$set': {'age':26}}tweets.update_one(query,new_values)tweets.update_many(query,new_values)Limit the Result#for operations that return many records, limit() can be used to limit the result#only return 3 resultsthree_results = tweets.find().limit(3)ConclusionMongoDB is friendly to a traditional RDBMS user. For every level of granularity you can find an equivalent mapping to RDBMS, like collection-&gt;table, record(document)-&gt;row. But it does not offer an official GUI tool for developers, if you want to see the data more intuitively, Robo 3T is a good choice.]]></content>
+      <categories>
+        
+          <category> MongoDB </category>
+        
+          <category> cloud </category>
+        
+      </categories>
+      <tags>
+        
+          <tag> NoSQL </tag>
+        
+          <tag> Python </tag>
+        
+      </tags>
+      <tags></tags>
+    </entry>
+  
+    <entry>
+      <title><![CDATA[Cloud Project--Twitter Analysis]]></title>
+      <url>/cloud/2018/09/01/twitter-analysis/</url>
+      <content type="text"><![CDATA[IntroductionTwitter analysis is the project of COMP90024 Cluster and Cloud Computing. In this project, we are required to develop a twitter harvester to collect the tweets from a certain area within Australia, and then analyze the tweets to find out some insteresting correlations between tweets and general data from AURIN(Australian Urban Research Infrastructure Network). All the code will be deployed on the Nectar researcch cloud. I am responsible for the whole backend development and deployment of the system. Source code can be found here on github.RequirementsUnderstanding requirements is crucial for the development of the whole system. In this project, the system should be able to continue working with some errors to ensure the fault tolerence of the harvester, a couchdb cluster is needed to be deployed on multiple instances. There are two kinds of harvesters: one is the realtime harvester, which is used to capture the realtime tweets; the other one is the past harvester, which is used to capture the past tweets. One realtime harvester is enough to deal with all the upcoming tweets in Australia, but there are too many past tweets to dig, it is better to use several harvesters working in parallel to improve the efficiency.System ArchitechtureThe above shows the general architecture of the system. A couchdb cluster consisting of three nodes are deployed on three instances on the cloud. The realtime and historical tweet harvesters can be deployed on any instance. Then the sentiment analysis algorithms are applied on the data to find the correlations. In the end, all the data is delivered to through the frontend page to the reader.In this project, I used Boto to automate the setting up of cloud instances. After the instances are set up, Ansible scripts are used to automatically deploy the couchdb and the whole system to the instances. Below is the video showing the automated deployment of the system from scratch.Further improvementCode StructureThe code should be organized in a clearer way.Ansible scriptsUploading the files to the server can also be done by ansible scripts.ContainerisationContainerisation makes it easier to deploy the whole application.Git branch issueAll team members committed to the master branch directly. Instead, each team member should be working on different branches and then merge to the master branch once approved by the team.]]></content>
+      <categories>
+        
+          <category> cloud </category>
+        
+      </categories>
+      <tags>
+        
+          <tag> DevOps </tag>
+        
+          <tag> docker </tag>
+        
+          <tag> ansible </tag>
+        
+          <tag> couchdb </tag>
+        
+          <tag> AWS </tag>
+        
+          <tag> boto </tag>
+        
+      </tags>
+      <tags></tags>
+    </entry>
+  
+</search>
